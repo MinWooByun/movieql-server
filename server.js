@@ -4,7 +4,7 @@ import { ApolloServer, gql } from "apollo-server";
 // type을 module로 지정하지 않으면 아래처럼 선언해야 한다.
 // const { ApolloServer, gql } = require("apollo-server");
 
-const tweets = [
+let tweets = [
   {
     id: "1",
     text: "first one!",
@@ -49,8 +49,24 @@ const resolvers = {
       return tweets;
     },
     // arguments가 있는 API는 항상 첫 번째 인자는 root이고 두 번째 인자는 API에서 받아온 arguments이다.
-    tweet(root, { id }) {
+    tweet(_, { id }) {
       return tweets.find((tweet) => tweet.id === id);
+    },
+  },
+  Mutation: {
+    postTweet(_, { text, userId }) {
+      const newTweet = {
+        id: tweets.length + 1,
+        text,
+      };
+      tweets.push(newTweet);
+      return newTweet;
+    },
+    deleteTweet(_, { id }) {
+      const tweet = tweets.find((tweet) => tweet.id === id);
+      if (!tweet) return false;
+      tweets = tweets.filter((tweet) => tweet.id != id);
+      return true;
     },
   },
 };
