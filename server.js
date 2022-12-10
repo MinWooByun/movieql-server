@@ -8,10 +8,12 @@ let tweets = [
   {
     id: "1",
     text: "first one!",
+    userId: "2",
   },
   {
     id: "2",
     text: "second one!",
+    userId: "1",
   },
 ];
 
@@ -36,16 +38,19 @@ const typeDefs = gql`
     lastName: String!
     fullName: String!
   }
+
   type Tweet {
     id: ID!
     text: String!
     author: User
   }
+
   type Query {
     allUsers: [User!]!
     allTweets: [Tweet!]!
     tweet(id: ID!): Tweet
   }
+
   type Mutation {
     postTweet(text: String!, userId: ID!): Tweet!
     deleteTweet(id: ID!): Boolean!
@@ -74,12 +79,18 @@ const resolvers = {
 
   Mutation: {
     postTweet(_, { text, userId }) {
-      const newTweet = {
-        id: tweets.length + 1,
-        text,
-      };
-      tweets.push(newTweet);
-      return newTweet;
+      const userCheck = users.find((user) => user.id === userId);
+      if (userCheck) {
+        const newTweet = {
+          id: tweets.length + 1,
+          text,
+          userId,
+        };
+        tweets.push(newTweet);
+        return newTweet;
+      } else {
+        console.log("userId is not find");
+      }
     },
     deleteTweet(_, { id }) {
       const tweet = tweets.find((tweet) => tweet.id === id);
@@ -92,6 +103,13 @@ const resolvers = {
   User: {
     fullName({ firstName, lastName }) {
       return `${firstName} ${lastName}`;
+    },
+  },
+
+  Tweet: {
+    // Tweet에는 author가 없기 때문에 이렇게 하나만 인자를 주게 되면 상위의 값들을 얻을 수 있다.
+    author({ userId }) {
+      return users.find((user) => user.id === userId);
     },
   },
 };
