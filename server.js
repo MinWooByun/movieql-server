@@ -49,9 +49,11 @@ const typeDefs = gql`
   }
 
   type Query {
+    allMovies: [Movie!]!
     allUsers: [User!]!
     allTweets: [Tweet!]!
     tweet(id: ID!): Tweet
+    movie(id: String!): Movie
   }
 
   type Mutation {
@@ -60,6 +62,29 @@ const typeDefs = gql`
     트윗을 찾으면 삭제하고, 찾지 못하면 false를 return한다.
     """
     deleteTweet(id: ID!): Boolean!
+  }
+
+  type Movie {
+    id: Int!
+    url: String!
+    imdb_code: String!
+    title: String!
+    title_english: String!
+    title_long: String!
+    slug: String!
+    year: Int!
+    rating: Float!
+    runtime: Float!
+    genres: [String]!
+    summary: String
+    description_full: String!
+    yt_trailer_code: String!
+    language: String!
+    background_image: String!
+    background_image_original: String!
+    small_cover_image: String!
+    medium_cover_image: String!
+    large_cover_image: String!
   }
 `;
 // GET /api/v1/tweets
@@ -80,6 +105,16 @@ const resolvers = {
     allUsers() {
       console.log("allUsers called!");
       return users;
+    },
+    allMovies() {
+      return fetch("https://yts.mx/api/v2/list_movies.json")
+        .then((response) => response.json())
+        .then((json) => json.data.movies);
+    },
+    movie(_, { id }) {
+      return fetch(`https://yts.mx/api/v2/movie_details.json?movie_id=${id}`)
+        .then((response) => response.json())
+        .then((json) => json.data.movie);
     },
   },
 
