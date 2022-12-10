@@ -39,6 +39,9 @@ const typeDefs = gql`
     fullName: String!
   }
 
+  """
+  트윗 오브젝트는 트윗에 대한 리소스를 나타냅니다.
+  """
   type Tweet {
     id: ID!
     text: String!
@@ -53,6 +56,9 @@ const typeDefs = gql`
 
   type Mutation {
     postTweet(text: String!, userId: ID!): Tweet!
+    """
+    트윗을 찾으면 삭제하고, 찾지 못하면 false를 return한다.
+    """
     deleteTweet(id: ID!): Boolean!
   }
 `;
